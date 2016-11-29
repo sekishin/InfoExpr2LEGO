@@ -13,6 +13,9 @@ public class RunThread implements Runnable{
 		goStraight(18);
 		turn(23);
 		goStraight(53);
+		turn(55);
+		bigCircle(700, 520, 95);
+		smallCircle(700, 480, 134);
 		leftMotor.stop();
 		rightMotor.stop();
 	}
@@ -33,7 +36,34 @@ public class RunThread implements Runnable{
 			leftMotor.backward();
 			rightMotor.forward();
 		}
+	}
 
+	public void  bigCircle(int rSpeed, int lSpeed, int time) {
+		leftMotor.setSpeed(lSpeed);
+		rightMotor.setSpeed(rSpeed);
+		while (TimeThread.getTime() <= time) {
+			rightMotor.forward();
+			leftMotor.forward();
+		}
+		leftMotor.setSpeed(300);
+		rightMotor.setSpeed(300);
+		while (TimeThread.getTime() <= time+11) {
+			rightMotor.backward();
+			leftMotor.forward();
+		}
+		rightMotor.stop(true);
+		leftMotor.stop();
+	}
+
+	public void smallCircle(int rSpeed, int lSpeed, int time) {
+		leftMotor.setSpeed(lSpeed);
+		rightMotor.setSpeed(rSpeed);
+		while (TimeThread.getTime() <= time) {
+			rightMotor.forward();
+			leftMotor.forward();
+		}
+		rightMotor.stop(true);
+		leftMotor.stop();
 	}
 
 }
