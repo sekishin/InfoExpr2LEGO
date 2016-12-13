@@ -10,8 +10,8 @@ import lejos.robotics.RegulatedMotor;
 public class RunThread implements Runnable {
 
 	static TouchSensor touch = new TouchSensor(SensorPort.S1);
-	static RegulatedMotor rightMotor  = Motor.B;
-	static RegulatedMotor leftMotor  = Motor.C;
+	static RegulatedMotor rightMotor = Motor.B;
+	static RegulatedMotor leftMotor = Motor.C;
 	static int speedUp = 20;
 	static int speedDown = 20;
 	static final int DEFAULT_SPEED = 800;
@@ -28,36 +28,26 @@ public class RunThread implements Runnable {
 
 		// Go Straight
 		leftMotor.resetTachoCount();
-		while ( ! SensorThread.isRed() ) {
-			//motorSetSpeed(veryHighSpeed, veryHighSpeed);
-			//motorForward();
+		while (!SensorThread.isRed()) {
 			lineTrace();
-			if ( touch.isPressed() ) break;
+			if (touch.isPressed()) break;
 		}
 		Button.LEDPattern(2); // 赤色に点灯
 
-
 		// turn
 		leftMotor.resetTachoCount();
-		while ( leftMotor.getTachoCount() <= turnTachoCount ) {
+		while (leftMotor.getTachoCount() <= turnTachoCount) {
 			motorSetSpeed(highSpeed, highSpeed);
 			motorTurn();
 			LCD.clear();
 			LCD.drawString(Integer.toString(leftMotor.getTachoCount()), 0, 0);
 			LCD.refresh();
 		}
-/*
-		while ( ! SensorThread.isRed() ) {
-			motorSetSpeed(highSpeed, highSpeed);
-			motorTurn();
-			if ( touch.isPressed() ) break;
-		}
-*/
 		leftMotor.stop(true);
 		rightMotor.stop();
 
 		// Start Line Trace
-		while( ! touch.isPressed() ){
+		while (!touch.isPressed()) {
 			lineTrace();
 		}
 		leftMotor.stop(true);
@@ -83,14 +73,14 @@ public class RunThread implements Runnable {
 		}
 	}
 
-	private static void motorSetSpeed(int leftMotorSpeed, int rightMotorSpeed){
+	private static void motorSetSpeed(int leftMotorSpeed, int rightMotorSpeed) {
 		leftMotor.setSpeed(leftMotorSpeed);
 		rightMotor.setSpeed(rightMotorSpeed);
-		//leftMotor.setSpeed(0);
-		//rightMotor.setSpeed(0);
+		// leftMotor.setSpeed(0);
+		// rightMotor.setSpeed(0);
 	}
 
-	private static void motorForward(){
+	private static void motorForward() {
 		leftMotor.forward();
 		rightMotor.forward();
 	}

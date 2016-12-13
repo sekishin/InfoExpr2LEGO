@@ -13,65 +13,68 @@ public class SensorThread implements Runnable {
 	static float diffRed = 0.10F;
 	static float diffGreen = 0.07F;
 
-
 	@Override
 	public void run() {
-		while ( ! RunThread.touch.isPressed() ) {
+		while (!RunThread.touch.isPressed()) {
 			/*
-			LCD.clear();
-			LCD.drawString("RR:" + rightColor.getRed(), 0, 0);
-			LCD.drawString("RG:" + rightColor.getGreen(), 0, 1);
-			LCD.drawString("RB:" + rightColor.getBlue(), 0, 2);
-			LCD.drawString("LR:" + leftColor.getRed(), 0, 3);
-			LCD.drawString("LG:" + leftColor.getGreen(), 0, 4);
-			LCD.drawString("LB:" + leftColor.getBlue(), 0, 5);
-			LCD.refresh();
-			*/
+			 * LCD.clear(); LCD.drawString("RR:" + rightColor.getRed(), 0, 0);
+			 * LCD.drawString("RG:" + rightColor.getGreen(), 0, 1);
+			 * LCD.drawString("RB:" + rightColor.getBlue(), 0, 2);
+			 * LCD.drawString("LR:" + leftColor.getRed(), 0, 3);
+			 * LCD.drawString("LG:" + leftColor.getGreen(), 0, 4);
+			 * LCD.drawString("LB:" + leftColor.getBlue(), 0, 5); LCD.refresh();
+			 */
 		}
 	}
 
+	/*
+	 * decide go distination
+	 * 
+	 * @return Distination
+	 */
 	public static Distination getSensor() {
-
-		if ( isBlack(leftColor) ) {
-			if (isBlack(rightColor) ) return Distination.ELSE;
+		if (isBlack(leftColor)) {
+			if (isBlack(rightColor))
+				return Distination.ELSE;
 			return Distination.LEFT;
-		}
-		else {
-			if ( isBlack(rightColor) ) return Distination.RIGHT;
+		} else {
+			if (isBlack(rightColor))
+				return Distination.RIGHT;
 			return Distination.STRAIGHT;
 		}
-/*
-		if( leftColor.getLight() < middleValue && rightColor.getLight() >= middleValue){
-			return Distination.LEFT;
-		}
-		// 白＆黒
-		else if( leftColor.getLight() >= middleValue && rightColor.getLight() < middleValue){
-			return Distination.RIGHT;
-		}
-		// 白＆白
-		else if( leftColor.getLight() >= middleValue && rightColor.getLight() >= middleValue){
-			return Distination.STRAIGHT;
-		}
-		else {
-			return Distination.ELSE;
-		}
-*/
 	}
 
+	/*
+	 * judge green
+	 * 
+	 * @return boolean
+	 */
 	public static boolean isGreen() {
 		float red = leftColor.getRed();
 		float green = leftColor.getGreen();
 		float blue = leftColor.getBlue();
-		return ( green >= middleGreen && green > red+diffGreen && green > blue+diffGreen) ? true : false;
+		return (green >= middleGreen && green > red + diffGreen && green > blue
+				+ diffGreen) ? true : false;
 	}
 
+	/*
+	 * judge red
+	 * 
+	 * @return boolean
+	 */
 	public static boolean isRed() {
 		float red = leftColor.getRed();
 		float green = leftColor.getGreen();
 		float blue = leftColor.getBlue();
-		return (red >= middleRed && red > green+diffRed && red > blue+diffRed) ? true : false;
+		return (red >= middleRed && red > green + diffRed && red > blue
+				+ diffRed) ? true : false;
 	}
 
+	/*
+	 * judge black
+	 * 
+	 * @return boolean
+	 */
 	private static boolean isBlack(ColorSensor cs) {
 		float red = cs.getRed();
 		float green = cs.getGreen();
