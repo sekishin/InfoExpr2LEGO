@@ -35,6 +35,7 @@ public class RunThread implements Runnable{
 	}
 
 	public void goCircleUnit() {
+		while ( TimeThread.getTime <= V2_FINISH_TIME );
 		goCircle(RIGHT_SPEED_FOR_BIG_CIRCLE, LEFT_SPEED_FOR_BIG_CIRCLE, C1_FINISH_TIME);
 		turn(V3_FINISH_TIME);
 		goCircle(RIGHT_SPEED_FOR_SMALL_CIRCLE, LEFT_SPEED_FOR_SMALL_CIRCLE, C2_FINISH_TIME);
