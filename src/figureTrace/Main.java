@@ -8,8 +8,8 @@ public class Main {
 	    Thread run   = new Thread(new RunThread());
 	    Thread sound = new Thread(new SoundThread());
 
-		run.start();
         time.start();
+		run.start();
         sound.start();
         try {
             run.join();

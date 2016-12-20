@@ -8,7 +8,7 @@ public class TimeThread implements Runnable {
 
     @Override
     public void run() {
-    	while(time <= 140) {
+    	while(time <= 160) {
     		Delay.msDelay(100);
     		time++;
     		LCD.clear();
@@ -18,5 +18,9 @@ public class TimeThread implements Runnable {
 
     public static int getTime() {
         return time;
+    }
+    
+    public static void setTime(int t) {
+    	time = t;
     }
 }

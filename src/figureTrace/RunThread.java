@@ -8,18 +8,18 @@ public class RunThread implements Runnable{
 	private static RegulatedMotor leftMotor  = Motor.C;
 	private static RegulatedMotor rightMotor  = Motor.B;
 	private static final int SPEED_FOR_STRAIGHT = 600;
-	private static final int SPEED_FOR_TURN = 300;
+	private static final int SPEED_FOR_TURN = 400;
 	private static final int RIGHT_SPEED_FOR_BIG_CIRCLE = 700;
-	private static final int LEFT_SPEED_FOR_BIG_CIRCLE = 520;
+	private static final int LEFT_SPEED_FOR_BIG_CIRCLE = 515;
 	private static final int RIGHT_SPEED_FOR_SMALL_CIRCLE = 700;
 	private static final int LEFT_SPEED_FOR_SMALL_CIRCLE = 480;
-	private static final int L1_FINISH_TIME = 18;
-	private static final int V1_FINISH_TIME = 23;
-	private static final int L2_FINISH_TIME = 53;
-	private static final int V2_FINISH_TIME = 55;
-	private static final int C1_FINISH_TIME = 95;
-	private static final int V3_FINISH_TIME = 106;
-	private static final int C2_FINISH_TIME = 134;
+	private static final int L1_FINISH_TIME = 19;
+	private static final int V1_FINISH_TIME = L1_FINISH_TIME + 6;
+	private static final int L2_FINISH_TIME = V1_FINISH_TIME + 35;
+	private static final int V2_FINISH_TIME = L2_FINISH_TIME + 5;
+	private static final int C1_FINISH_TIME = V2_FINISH_TIME + 39;
+	private static final int V3_FINISH_TIME = C1_FINISH_TIME + 14;
+	private static final int C2_FINISH_TIME = V3_FINISH_TIME + 32;
 
 	@Override
 	public void run() {
@@ -35,7 +35,8 @@ public class RunThread implements Runnable{
 	}
 
 	public void goCircleUnit() {
-		while ( TimeThread.getTime <= V2_FINISH_TIME );
+		TimeThread.setTime(V2_FINISH_TIME);
+		while ( TimeThread.getTime() <= V2_FINISH_TIME );
 		goCircle(RIGHT_SPEED_FOR_BIG_CIRCLE, LEFT_SPEED_FOR_BIG_CIRCLE, C1_FINISH_TIME);
 		turn(V3_FINISH_TIME);
 		goCircle(RIGHT_SPEED_FOR_SMALL_CIRCLE, LEFT_SPEED_FOR_SMALL_CIRCLE, C2_FINISH_TIME);
@@ -47,6 +48,7 @@ public class RunThread implements Runnable{
 			leftMotor.forward();
 			rightMotor.forward();
 		}
+		stopMoter();
 	}
 
 	public void turn(int time) {

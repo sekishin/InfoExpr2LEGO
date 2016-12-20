@@ -15,30 +15,20 @@ public class SensorThread implements Runnable {
 
 	@Override
 	public void run() {
-		while (!RunThread.touch.isPressed()) {
-			/*
-			 * LCD.clear(); LCD.drawString("RR:" + rightColor.getRed(), 0, 0);
-			 * LCD.drawString("RG:" + rightColor.getGreen(), 0, 1);
-			 * LCD.drawString("RB:" + rightColor.getBlue(), 0, 2);
-			 * LCD.drawString("LR:" + leftColor.getRed(), 0, 3);
-			 * LCD.drawString("LG:" + leftColor.getGreen(), 0, 4);
-			 * LCD.drawString("LB:" + leftColor.getBlue(), 0, 5); LCD.refresh();
-			 */
-		}
+		while (! RunThread.touch.isPressed() );
 	}
 
 	/*
 	 * decide go distination
-	 * 
 	 * @return Distination
 	 */
 	public static Distination getSensor() {
-		if (isBlack(leftColor)) {
-			if (isBlack(rightColor))
+		if ( isBlack(leftColor) ) {
+			if ( isBlack(rightColor) )
 				return Distination.ELSE;
 			return Distination.LEFT;
 		} else {
-			if (isBlack(rightColor))
+			if ( isBlack(rightColor) )
 				return Distination.RIGHT;
 			return Distination.STRAIGHT;
 		}
@@ -46,33 +36,28 @@ public class SensorThread implements Runnable {
 
 	/*
 	 * judge green
-	 * 
 	 * @return boolean
 	 */
 	public static boolean isGreen() {
 		float red = leftColor.getRed();
 		float green = leftColor.getGreen();
 		float blue = leftColor.getBlue();
-		return (green >= middleGreen && green > red + diffGreen && green > blue
-				+ diffGreen) ? true : false;
+		return ( green >= middleGreen && green > red + diffGreen && green > blue + diffGreen ) ? true : false;
 	}
 
 	/*
 	 * judge red
-	 * 
 	 * @return boolean
 	 */
 	public static boolean isRed() {
 		float red = leftColor.getRed();
 		float green = leftColor.getGreen();
 		float blue = leftColor.getBlue();
-		return (red >= middleRed && red > green + diffRed && red > blue
-				+ diffRed) ? true : false;
+		return ( red >= middleRed && red > green + diffRed && red > blue + diffRed ) ? true : false;
 	}
 
 	/*
 	 * judge black
-	 * 
 	 * @return boolean
 	 */
 	private static boolean isBlack(ColorSensor cs) {
@@ -81,6 +66,6 @@ public class SensorThread implements Runnable {
 		float blue = cs.getBlue();
 
 		float average = (red + green + blue) / 3;
-		return (average > middleValue) ? false : true;
+		return ( average > middleValue ) ? false : true;
 	}
 }
