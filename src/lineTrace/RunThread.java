@@ -1,8 +1,6 @@
 package lineTrace;
 
 import jp.ac.kagawa_u.infoexpr.Sensor.TouchSensor;
-import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
@@ -17,7 +15,10 @@ public class RunThread implements Runnable {
 	static int highSpeed = 600;	// 直進時のモーターの速度
 	static int rightHighSpeed = 850;	// 左折時の右モーターの速度
 	static int leftHighSpeed = 750;	// 右折時の左モーターの速度
-	static int turnTachoCount = 730;	// 回転時の回転角度
+	static int turnTachoCount = 720;	// 回転時の回転角度
+	static long lastRedDetectionTime = 0;
+	static long redDetectionInterval = 3000;
+
 
 	@Override
 	public void run() {
@@ -48,14 +49,15 @@ public class RunThread implements Runnable {
 	}
 
 	private static void turn() {
-		Button.LEDPattern(2);
-		leftMotor.resetTachoCount();
-		motorSetSpeed(highSpeed, highSpeed);
-		while (leftMotor.getTachoCount() <= turnTachoCount) {
-			motorTurn();
+		if ( System.currentTimeMillis() > lastRedDetectionTime + redDetectionInterval ) {
+			leftMotor.resetTachoCount();
+			motorSetSpeed(highSpeed, highSpeed);
+			while (leftMotor.getTachoCount() <= turnTachoCount) {
+				motorTurn();
+			}
+			motorStop();
+			lastRedDetectionTime = System.currentTimeMillis();
 		}
-		motorStop();
-		Button.LEDPattern(0);
 	}
 
 	private static void motorSetSpeed(int leftMotorSpeed, int rightMotorSpeed) {

@@ -15,7 +15,8 @@ public class SensorThread implements Runnable {
 
 	@Override
 	public void run() {
-		while (! RunThread.touch.isPressed() );
+		while (! RunThread.touch.isPressed() ) {
+		}
 	}
 
 	/*

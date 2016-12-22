@@ -6,7 +6,7 @@ import lejos.utility.Delay;
 
 public class SoundThread  implements Runnable {
 
-	private static final int BEEP_TIME = 45;
+	private static final int BEEP_TIME = 40;
 	@Override
 	public void run() {
 		while(TimeThread.getTime() <= BEEP_TIME);
