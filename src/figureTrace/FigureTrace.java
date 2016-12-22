@@ -1,6 +1,6 @@
 package figureTrace;
 
-public class FigureTracce {
+public class FigureTrace {
 
 
 	public static void main(String[] args) {
