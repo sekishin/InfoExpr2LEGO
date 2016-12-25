@@ -16,6 +16,8 @@ public class RunThread implements Runnable {
 	private static Random rand = new Random();
 	private static final int MAX_TURN_TACHO_COUNT = 600;
 	private static final int MAX_BACK_TACHO_COUNT = 50;
+	private static final int SWING_WIDYH = 100;
+	private static boolean goleft = true;
 
 	@Override
 	public void run() {
@@ -97,6 +99,11 @@ public class RunThread implements Runnable {
 		rightMotor.forward();
 	}
 	
-	
+	public void headShake() {
+		if ( goleft ) motorSetSpeed(lowSpeed, highSpeed);
+		else motorSetSpeed(highSpeed, lowSpeed);
+		moterForward();
+		if ( getTachoCount() >= SWING_WIDYH ) goleft = ! goleft;
+	}
 
 }
