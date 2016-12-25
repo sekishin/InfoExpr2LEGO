@@ -18,7 +18,6 @@ public class SensorThread implements Runnable {
 
 	/*
 	 * decide go distination
-	 *
 	 * @return Distination
 	 */
 	public static Distination getSensor() {
@@ -33,7 +32,6 @@ public class SensorThread implements Runnable {
 
 	/*
 	 * judge black
-	 *
 	 * @return boolean
 	 */
 	private static boolean isBlack(ColorSensor cs) {

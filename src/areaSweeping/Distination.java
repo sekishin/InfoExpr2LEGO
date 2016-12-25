@@ -1,8 +1,8 @@
 package areaSweeping;
 
 public enum Distination {
-	STRAIGHT,
-	RIGHT,
-	LEFT,
-	ELSE
+	STRAIGHT,	// まっすぐバック
+	RIGHT,	// 右にバック
+	LEFT,	// 左にバック
+	ELSE	// 進む
 }
