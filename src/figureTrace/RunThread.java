@@ -7,12 +7,14 @@ public class RunThread implements Runnable{
 
 	private static RegulatedMotor leftMotor  = Motor.C;
 	private static RegulatedMotor rightMotor  = Motor.B;
+	/*	スピード定数	*/
 	private static final int SPEED_FOR_STRAIGHT = 600;
 	private static final int SPEED_FOR_TURN = 350;
 	private static final int RIGHT_SPEED_FOR_BIG_CIRCLE = 700;
 	private static final int LEFT_SPEED_FOR_BIG_CIRCLE = 515;
 	private static final int RIGHT_SPEED_FOR_SMALL_CIRCLE = 700;
 	private static final int LEFT_SPEED_FOR_SMALL_CIRCLE = 470;
+	/*	移動距離定数	*/
 	//private static final int L1_FINISH_TIME = 19;
 	private static final int L1_TACHO_COUNT = 100;
 	private static final int V1_TACHO_COUNT = 170;
@@ -111,7 +113,7 @@ public class RunThread implements Runnable{
 	}
 	
 	public static int getTachoCount() {
-		return rightMotor.getTachoCount();
+		return Math.abs(leftMotor.getTachoCount());
 	}
 
 }
