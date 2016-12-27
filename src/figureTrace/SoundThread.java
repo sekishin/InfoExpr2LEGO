@@ -6,7 +6,7 @@ import lejos.utility.Delay;
 
 public class SoundThread  implements Runnable {
 
-	private static final int BEEP_TACHO_COUNT = RunThread.L2_TACHO_COUNT / 2;
+	private static final int BEEP_TACHO_COUNT = 850;
 	private static boolean isBeep = false;
 	
 	@Override
