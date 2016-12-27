@@ -17,7 +17,7 @@ public class RunThread implements Runnable {
 	static int leftHighSpeed = 750;	// 右折時の左モーターの速度
 	static int turnTachoCount = 720;	// 回転時の回転角度
 	static long lastRedDetectionTime = 0;
-	static long redDetectionInterval = 3000;
+	static long redDetectionInterval = 10000;
 
 
 	@Override

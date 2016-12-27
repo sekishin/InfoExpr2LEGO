@@ -10,45 +10,48 @@ public class RunThread implements Runnable {
 
 	static RegulatedMotor rightMotor = Motor.B;
 	static RegulatedMotor leftMotor = Motor.C;
-	private static int lowSpeed = 300;
-	private static int highSpeed = 600;
-	private static int veryHighSpeed = 800;
+	private static int lowSpeed = 400;
+	private static int highSpeed = 700;
+	private static int veryHighSpeed = 600;
+	private static int veryLowSpeed = 100;
 	private static Random rand = new Random();
-	private static final int MAX_TURN_TACHO_COUNT = 600;
-	private static final int MAX_BACK_TACHO_COUNT = 50;
-	private static final int SWING_WIDYH = 100;
+	private static final int BACK_TACHO_COUNT = 200;
+	private static final int TURN_TACHO_COUNT = 240;
+	private static final int SWING_WIDYH = 150;
 	private static boolean goleft = true;
 
 	@Override
 	public void run() {
+		resetTachoCount();
 		while ( ! Button.ESCAPE.isDown() ) {
 			switch (SensorThread.getSensor()) {
 			case STRAIGHT:
 				motorSetSpeed(highSpeed, highSpeed);
-				moterBackward(randomTachoCount(MAX_BACK_TACHO_COUNT));
-				rightTurn(randomTachoCount(MAX_TURN_TACHO_COUNT));
+				moterBackward(BACK_TACHO_COUNT);
+				if ( rand.nextInt(100) % 2 == 0 ) rightTurn(randomTachoCount(TURN_TACHO_COUNT));
+				else leftTurn(randomTachoCount(TURN_TACHO_COUNT));
 				break;
 			case LEFT:
 				motorSetSpeed(lowSpeed, highSpeed);
-				moterBackward(randomTachoCount(MAX_BACK_TACHO_COUNT));
+				moterBackward(BACK_TACHO_COUNT);
+				rightTurn(randomTachoCount(TURN_TACHO_COUNT));
 				break;
 			case RIGHT:
 				motorSetSpeed(highSpeed, lowSpeed);
-				moterBackward(randomTachoCount(MAX_BACK_TACHO_COUNT));
+				moterBackward(BACK_TACHO_COUNT);
+				leftTurn(randomTachoCount(TURN_TACHO_COUNT));
 				break;
 			default:
-				motorSetSpeed(veryHighSpeed, veryHighSpeed);
-				moterForward();
+				motorSetSpeed(highSpeed, highSpeed);
+				//moterForward();
+				headShake();
 				break;
 			}
 		}
 		motorStop();
 	}
 	
-	public int randomTachoCount(int max) {
-		return rand.nextInt(max) + 1;
-	}
-
+	
 	public static void motorSetSpeed(int leftMotorSpeed, int rightMotorSpeed) {
 		leftMotor.setSpeed(leftMotorSpeed);
 		rightMotor.setSpeed(rightMotorSpeed);
@@ -59,13 +62,17 @@ public class RunThread implements Runnable {
 		rightMotor.stop();
 	}
 
+	public int randomTachoCount(int w) {
+		return rand.nextInt(w+1);
+	}
+
 	public void resetTachoCount() {
 		rightMotor.resetTachoCount();
 		leftMotor.resetTachoCount();
 	}
 	
 	public int getTachoCount() {
-		return Math.abs(leftMotor.getTachoCount());
+		return Math.max(Math.abs(leftMotor.getTachoCount()), Math.abs(rightMotor.getTachoCount()));
 	}
 	
 	public void rightTurn(int tc) {
@@ -81,15 +88,15 @@ public class RunThread implements Runnable {
 		resetTachoCount();
 		motorSetSpeed(highSpeed, highSpeed);
 		while ( getTachoCount() <= tc ) {
-			leftMotor.forward();
-			rightMotor.backward();
+			leftMotor.backward();
+			rightMotor.forward();
 		}
 	}
 	
 	public void moterBackward(int tc) {
 		resetTachoCount();
 		while ( getTachoCount() <= tc ) {
-			leftMotor.forward();
+			leftMotor.backward();
 			rightMotor.backward();
 		}
 	}
@@ -100,10 +107,13 @@ public class RunThread implements Runnable {
 	}
 	
 	public void headShake() {
-		if ( goleft ) motorSetSpeed(lowSpeed, highSpeed);
-		else motorSetSpeed(highSpeed, lowSpeed);
+		if ( goleft ) motorSetSpeed(veryLowSpeed, veryHighSpeed);
+		else motorSetSpeed(veryHighSpeed, veryLowSpeed);
 		moterForward();
-		if ( getTachoCount() >= SWING_WIDYH ) goleft = ! goleft;
+		if ( getTachoCount() >= SWING_WIDYH ) {
+			goleft = ! goleft;
+			resetTachoCount();
+		}
 	}
 
 }
