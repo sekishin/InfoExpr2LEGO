@@ -7,8 +7,8 @@ public class TargetGoAround {
 		Thread sensor = new Thread(new SensorThread());
 		Thread sound = new Thread(new SoundThread());
 
-		run.start();
 		sensor.start();
+		run.start();
 		sound.start();
 		try {
 			run.join();

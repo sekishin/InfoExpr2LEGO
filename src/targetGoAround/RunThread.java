@@ -2,6 +2,7 @@ package targetGoAround;
 
 import jp.ac.kagawa_u.infoexpr.Sensor.TouchSensor;
 import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.port.SensorPort;
 import lejos.robotics.RegulatedMotor;
@@ -31,8 +32,12 @@ public class RunThread implements Runnable {
 		while ( ! SensorThread.isFind() && ! Button.ESCAPE.isDown() ) {
 			lineTrace();
 		}
-		straightTachoCount = calcTaxhoCount(SensorThread.getDistance());
-		//distance = SensorThread.getDistance();
+		distance = SensorThread.getDistance();
+		LCD.clear();
+		LCD.drawString(String.valueOf(distance), 0, 0);
+		straightTachoCount = calcTaxhoCount(distance);
+		LCD.drawString(String.valueOf(straightTachoCount), 0, 1);
+		LCD.refresh();
 		goAround();
 		recovery();
 		while ( ! Button.ESCAPE.isDown() ) {
@@ -62,7 +67,8 @@ public class RunThread implements Runnable {
 	
 	private void recovery() {
 		motorSetSpeed(highSpeed, highSpeed);
-		while ( SensorThread.getDistination() != Distination.LEFT &&  ! Button.ESCAPE.isDown() ) {
+		leftMotor.resetTachoCount();
+		while ( SensorThread.getDistination() != Distination.LEFT &&  ! Button.ESCAPE.isDown() && leftMotor.getTachoCount() < 1000) {
 			motorForward();
 		}
 	}
@@ -75,7 +81,7 @@ public class RunThread implements Runnable {
 			leftMotor.resetTachoCount();
 			motorSetSpeed(highSpeed, highSpeed);
 			if ( i == 0 ) {
-				while ( leftMotor.getTachoCount() <= straightTachoCount-100 && ! Button.ESCAPE.isDown() ) {
+				while ( leftMotor.getTachoCount() <= straightTachoCount-200 && ! Button.ESCAPE.isDown() ) {
 					motorForward();
 				}
 			} else {
@@ -83,12 +89,15 @@ public class RunThread implements Runnable {
 					motorForward();
 				}
 			}
-			
+			LCD.drawString(String.valueOf(leftMotor.getTachoCount()), 0, 2);
+			LCD.refresh();
 			if ( Button.ESCAPE.isDown() ) break;
 			rightMotor.resetTachoCount();
 			while ( rightMotor.getTachoCount() <= TURN_TACHO_COUNT && ! Button.ESCAPE.isDown() ) {
 				motorTurn();
 			}
+			LCD.drawString(String.valueOf(rightMotor.getTachoCount()), 0, 3);
+			LCD.refresh();
 			if ( Button.ESCAPE.isDown() ) break;
 		}
 	}
