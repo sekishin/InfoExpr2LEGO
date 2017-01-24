@@ -28,9 +28,15 @@ public class RunThread implements Runnable {
 	@Override
 	public void run() {
 		while ( wait );
+		/*while ( Button.ESCAPE.isUp() ) {
+			motorSetSpeed(lowSpeed, lowSpeed);
+			motorForward();
+		}*/
+
 		lineTrace();
 		garageIO();
 		lineTrace();
+
 	}
 
 	private static void garageIO() {
@@ -47,17 +53,15 @@ public class RunThread implements Runnable {
 	private static void adjustmentRun() {
 		boolean isSame = false;
 		while ( true && Button.ESCAPE.isUp()) {
-			LCD.clear();
 			rightState = SensorThread.getRightState();
 			leftState = SensorThread.getLeftState();
-			LCD.drawString("R : " + color[toInt(rightState)], 0, 2);
-			LCD.drawString("L : " + color[toInt(leftState)], 0, 3);
-			LCD.drawString("GarageIO", 0, 0);
-			LCD.refresh();
-			if ( rightState == SenserColor.GRAY2 && leftState == SenserColor.GRAY2 && ! parkNow ) {
+//			LCD.clear();
+//			LCD.drawString("GarageIO", 0, 0);
+//			LCD.refresh();
+			if ( rightState == SenserColor.GRAY4 && leftState == SenserColor.GRAY4 && ! parkNow ) {
 				parkNow = true;
 			}
-			if ( parkNow && ! parkStart && rightState == SenserColor.GRAY1 && leftState == SenserColor.GRAY1) {
+			if ( parkNow && ! parkStart && rightState == SenserColor.GRAY3 && leftState == SenserColor.GRAY3) {
 				parkStart = true;
 				break;
 			}
@@ -73,6 +77,7 @@ public class RunThread implements Runnable {
 					else motorSetSpeed(lowSpeed, 0);
 				}
 			} else motorSetSpeed(lowSpeed, lowSpeed);
+			motorSetSpeed(lowSpeed, lowSpeed);
 			motorForward();
 		}
 	}
@@ -80,32 +85,26 @@ public class RunThread implements Runnable {
 		boolean flag = true;
 		Distination last = decideDistination(rightState, leftState);
 		while ( flag && Button.ESCAPE.isUp() ) {
-			LCD.clear();
 			rightState = SensorThread.getRightState();
 			leftState = SensorThread.getLeftState();
-			LCD.drawString("R : " + color[toInt(rightState)], 0, 2);
-			LCD.drawString("L : " + color[toInt(leftState)], 0, 3);
-			LCD.drawString("RecoveryTrace", 0, 0);
+//			LCD.clear();
+//			LCD.drawString("RecoveryTrace", 0, 0);
 			if ( decideDistination(rightState, leftState) != last ) break;
 			switch ( decideDistination(rightState, leftState)) {
 			case STRAIGHT:
 				flag = false;
 			case LEFT:
-				LCD.drawString("RIGHT", 0, 1);
 				motorSetSpeed(highSpeed, lowSpeed);
 				motorForward();
 				break;
 			case RIGHT:
-				LCD.drawString("LEFT", 0, 1);
 				motorSetSpeed(lowSpeed, highSpeed);
 				motorForward();
 				break;
 			default:
-				LCD.drawString("ELSE", 0, 1);
 				break;
 			}
-			LCD.refresh();
-
+//			LCD.refresh();
 		}
 
 	}
@@ -113,25 +112,20 @@ public class RunThread implements Runnable {
 	private static void lineTrace() {
 		boolean flag = true;
 		while ( flag && Button.ESCAPE.isUp() ) {
-			LCD.clear();
 			rightState = SensorThread.getRightState();
 			leftState = SensorThread.getLeftState();
-			LCD.drawString("R : " + color[toInt(rightState)], 0, 2);
-			LCD.drawString("L : " + color[toInt(leftState)], 0, 3);
-			LCD.drawString("LineTrace", 0, 0);
+//			LCD.clear();
+//			LCD.drawString("LineTrace", 0, 0);
 			switch ( decideDistination(rightState, leftState)) {
 			case STRAIGHT:
-				LCD.drawString("STRAIGHT", 0, 1);
 				motorSetSpeed(highSpeed, highSpeed);
 				motorForward();
 				break;
 			case LEFT:
-				LCD.drawString("LEFT", 0, 1);
 				motorSetSpeed(lowSpeed, highSpeed);
 				motorForward();
 				break;
 			case RIGHT:
-				LCD.drawString("RIGHT", 0, 1);
 				motorSetSpeed(highSpeed, lowSpeed);
 				motorForward();
 				break;
@@ -140,11 +134,9 @@ public class RunThread implements Runnable {
 				flag = false;
 				break;
 			default:
-				LCD.drawString("ELSE", 0, 1);
 				break;
 			}
-			LCD.refresh();
-
+//			LCD.refresh();
 		}
 	}
 
@@ -166,20 +158,21 @@ public class RunThread implements Runnable {
 			LCD.clear();
 			rightState = SensorThread.getRightState();
 			leftState = SensorThread.getLeftState();
-			LCD.drawString("R : " + color[toInt(rightState)], 0, 2);
-			LCD.drawString("L : " + color[toInt(leftState)], 0, 3);
-			LCD.drawString("GarageIO", 0, 0);
-			LCD.refresh();
+//			LCD.drawString("GarageIO", 0, 0);
+//			LCD.refresh();
 
 			motorSetSpeed(leftMotorSpeed, rightMotorSpeed);
 			if ( rightState == SenserColor.BLUE ) {
 				rightMotorSpeed = 0;
-				if ( leftMotorSpeed != 0 ) leftMotorSpeed = lowSpeed; 
+				break;
+				//if ( leftMotorSpeed != 0 ) leftMotorSpeed = lowSpeed; 
+				
 			}
 
 			if ( leftState == SenserColor.BLUE ) {
 				leftMotorSpeed = 0;
-				if ( rightMotorSpeed != 0 ) rightMotorSpeed = lowSpeed;
+				break;
+				//if ( rightMotorSpeed != 0 ) rightMotorSpeed = lowSpeed;
 			}
 			if ( rightMotorSpeed == 0 && leftMotorSpeed == 0 ) {
 				break;
@@ -209,8 +202,8 @@ public class RunThread implements Runnable {
 	private static int toInt(SenserColor c) {
 		if ( c == SenserColor.WHITE ) return 0;
 		if ( c == SenserColor.BLACK ) return 1;
-		if ( c == SenserColor.GRAY1 ) return 3;
-		if ( c == SenserColor.GRAY2 ) return 4;
+		if ( c == SenserColor.GRAY3 ) return 2;
+		if ( c == SenserColor.GRAY4 ) return 3;
 		if ( c == SenserColor.BLUE ) return 5;
 		return 2;
 	}

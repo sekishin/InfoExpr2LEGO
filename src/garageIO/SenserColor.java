@@ -3,9 +3,10 @@ package garageIO;
 public enum SenserColor {
 	WHITE,
 	BLACK,
-	NONE,
 	GRAY1,
 	GRAY2,
-	BLUE;
-	
+	GRAY3,
+	GRAY4,
+	BLUE,
+	ELSE
 }

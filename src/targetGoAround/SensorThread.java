@@ -3,7 +3,6 @@ package targetGoAround;
 import jp.ac.kagawa_u.infoexpr.Sensor.ColorSensor;
 import jp.ac.kagawa_u.infoexpr.Sensor.UltrasonicSensor;
 import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
 import lejos.hardware.port.SensorPort;
 import lejos.utility.Delay;
 
@@ -12,7 +11,7 @@ public class SensorThread implements Runnable {
 	static ColorSensor rightColor = new ColorSensor(SensorPort.S2);
 	static ColorSensor leftColor = new ColorSensor(SensorPort.S3);
 	static UltrasonicSensor sonic = new UltrasonicSensor(SensorPort.S4);
-	private static int Count = 10;
+	private static int Count = 5;
 	static float newstate, state;
 	static boolean isStart = false;
 
@@ -26,15 +25,10 @@ public class SensorThread implements Runnable {
 				newstate += sonic.getDistance();
 			}
 			newstate /= Count;
-			//LCD.clear();
-			LCD.drawString(String.valueOf(state), 0, 3);
-			LCD.refresh();
 			state = newstate;
 			isStart = true;
-			Delay.msDelay(100);
+			Delay.msDelay(50);
 		}
-		LCD.clear();
-		LCD.refresh();
 	}
 
 	public static Distination getDistination() {
@@ -50,7 +44,7 @@ public class SensorThread implements Runnable {
 	}
 	
 	public static boolean isFind() {
-		return isStart && state < 0.4F && state > 0.05F; 
+		return isStart && state < 0.4F; 
 	}
 	
 	public static float getDistance() {

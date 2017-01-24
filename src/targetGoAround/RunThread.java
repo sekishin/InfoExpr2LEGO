@@ -12,17 +12,17 @@ public class RunThread implements Runnable {
 	static TouchSensor touch = new TouchSensor(SensorPort.S1);
 	static RegulatedMotor rightMotor = Motor.B;
 	static RegulatedMotor leftMotor = Motor.C;
-	static int leftLowSpeed = 300;	// 左折時の左モーターの速度
-	static int rightLowSpeed = 400;	// 右折時の右モーターの速度
+	static int leftLowSpeed = 200;	// 左折時の左モーターの速度
+	static int rightLowSpeed = 300;	// 右折時の右モーターの速度
 	static int highSpeed = 400;	// 直進時のモーターの速度
-	static int rightHighSpeed = 850;	// 左折時の右モーターの速度
-	static int leftHighSpeed = 750;	// 右折時の左モーターの速度
+	static int rightHighSpeed = 700;	// 左折時の右モーターの速度
+	static int leftHighSpeed = 600;	// 右折時の左モーターの速度
 	static int turnTachoCount = 720;	// 回転時の回転角度
 	static long lastRedDetectionTime = 0;
 	static long redDetectionInterval = 10000;
 	
 	static int straightTachoCount;
-	static final int TURN_TACHO_COUNT = 80;
+	static final int TURN_TACHO_COUNT = 90;
 	static float distance;
 	static float diff = 0.05F;
 
@@ -38,6 +38,7 @@ public class RunThread implements Runnable {
 		straightTachoCount = calcTaxhoCount(distance);
 		LCD.drawString(String.valueOf(straightTachoCount), 0, 1);
 		LCD.refresh();
+		motorStop();
 		goAround();
 		recovery();
 		while ( ! Button.ESCAPE.isDown() ) {
@@ -68,7 +69,7 @@ public class RunThread implements Runnable {
 	private void recovery() {
 		motorSetSpeed(highSpeed, highSpeed);
 		leftMotor.resetTachoCount();
-		while ( SensorThread.getDistination() != Distination.LEFT &&  ! Button.ESCAPE.isDown() && leftMotor.getTachoCount() < 1000) {
+		while ( SensorThread.getDistination() != Distination.LEFT &&  ! Button.ESCAPE.isDown() && leftMotor.getTachoCount() < 500) {
 			motorForward();
 		}
 	}
@@ -77,21 +78,7 @@ public class RunThread implements Runnable {
 	}
 	
 	private static void goAround() {
-		for (int i = 0; i < 6; i++ ) {
-			leftMotor.resetTachoCount();
-			motorSetSpeed(highSpeed, highSpeed);
-			if ( i == 0 ) {
-				while ( leftMotor.getTachoCount() <= straightTachoCount-200 && ! Button.ESCAPE.isDown() ) {
-					motorForward();
-				}
-			} else {
-				while ( leftMotor.getTachoCount() <= straightTachoCount && ! Button.ESCAPE.isDown() ) {
-					motorForward();
-				}
-			}
-			LCD.drawString(String.valueOf(leftMotor.getTachoCount()), 0, 2);
-			LCD.refresh();
-			if ( Button.ESCAPE.isDown() ) break;
+		for (int i = 0; i < 5; i++ ) {
 			rightMotor.resetTachoCount();
 			while ( rightMotor.getTachoCount() <= TURN_TACHO_COUNT && ! Button.ESCAPE.isDown() ) {
 				motorTurn();
@@ -99,6 +86,15 @@ public class RunThread implements Runnable {
 			LCD.drawString(String.valueOf(rightMotor.getTachoCount()), 0, 3);
 			LCD.refresh();
 			if ( Button.ESCAPE.isDown() ) break;
+			leftMotor.resetTachoCount();
+			motorSetSpeed(highSpeed, highSpeed);
+			while ( leftMotor.getTachoCount() <= straightTachoCount && ! Button.ESCAPE.isDown() ) {
+				motorForward();
+			}
+			LCD.drawString(String.valueOf(leftMotor.getTachoCount()), 0, 2);
+			LCD.refresh();
+			if ( Button.ESCAPE.isDown() ) break;
+			
 		}
 	}
 
