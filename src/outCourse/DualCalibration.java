@@ -11,7 +11,7 @@ public class DualCalibration {
 	private static float leftCalibData[][], rightCalibData[][];
 	private static ColorSensor leftColorSensor, rightColorSensor;
 	
-	private static String[] colorName = {"white", "black"};
+	private static String[] colorName = {"white", "black", "gray1", "gray2", "gray3", "gray4", "blue"};
 		
 	public static void executeCalibration(int n, ColorSensor left, ColorSensor right) {
 		int i;
