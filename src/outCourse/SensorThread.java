@@ -50,33 +50,53 @@ public class SensorThread implements Runnable {
 	private static final int V = 2;
 
 	// キャリブレーション誤差範囲
-	private static float whiteWidth = 0.04F;
+	private static float whiteWidth = 0.05F;
 	private static float blackWidth = 0.02F;
-	private static float gray1Width = 0.02F;
-	private static float gray2Width = 0.02F;
-	private static float gray3Width = 0.03F;
-	private static float gray4Width = 0.05F;
+	private static float gray1Width = 0.005F;
+	private static float gray2Width = 0.0115F;
+	private static float gray3Width = 0.0145F;
+	private static float gray4Width = 0.0445F;
 	private static float blueWidth = 30F;
 
 
-	// キャリブレーション値
+	// 検知範囲
 	private static float leftCalibData[][] = new float[COLORS][3];
 	private static float rightCalibData[][] = new float[COLORS][3];
 	
+	// 計測回数
+	static final int COUNT = 5;
 	
 	public SensorThread(ColorSensor left, ColorSensor right) {
+		int i;
 		leftColor = left;
 		rightColor = right;
+		for ( i = 0; i < COLORS-1; i++ ) {
+			//leftCalibData[i] = DualCalibration.getLeftCalibDataMax(i, V);
+			//rightCalibData[i] = DualCalibration.getRightCalibDataMax(i, V);
+			leftCalibData[i] = DualCalibration.getLeftCalibDataAve(i);
+			rightCalibData[i] = DualCalibration.getRightCalibDataAve(i);
+		}
+		//leftCalibData[i] = DualCalibration.getLeftCalibDataMax(i, H);
+		//rightCalibData[i] = DualCalibration.getRightCalibDataMax(i, H);
+		leftCalibData[i] = DualCalibration.getLeftCalibDataAve(i);
+		rightCalibData[i] = DualCalibration.getRightCalibDataAve(i);
 	}
 	
+	// 走行状態
+	private static final String[] STATE_NAME = {
+			"PRESS ENTER",
+			"STOP", 
+			"LINE TRACE", 
+			"TARGET SURROUND", 
+			"SHORT CIRCUIT", 
+			"GARAGE IN",
+			"GARAGE OUT",
+			"RECOVERY TRACE"
+			};
+	
 	@Override
-	public void run() {
-		for ( int i = 0; i < COLORS; i++ ) {
-			leftCalibData[i] = DualCalibration.getLeftCalibData(i);
-			rightCalibData[i] = DualCalibration.getRightCalibData(i);
-		}
-		
-		while ( Button.ESCAPE.isUp() && RunThread.isRun ) {
+	public void run() {		
+		while ( Button.ESCAPE.isUp() ) {
 			distance = sonic.getDistance();
 			leftValue = getSensorValue(leftColor);
 			rightValue = getSensorValue(rightColor);
@@ -85,9 +105,10 @@ public class SensorThread implements Runnable {
 			leftColorNum = toInt(leftState);
 			rightColorNum = toInt(rightState);
 			LCD.clear();
-			LCD.drawString("L : " + colorName[leftColorNum], 0, 0);
-			LCD.drawString("R : " + colorName[rightColorNum], 0, 1);
-			LCD.drawString("D : " + distance, 0, 2);
+			LCD.drawString(STATE_NAME[RunThread.runState], 0, 0);
+			LCD.drawString("L : " + colorName[leftColorNum], 0, 1);
+			LCD.drawString("R : " + colorName[rightColorNum], 0, 2);
+			LCD.drawString("D : " + distance, 0, 3);
 			LCD.refresh();
 			Delay.msDelay(50);
 		}
@@ -119,10 +140,14 @@ public class SensorThread implements Runnable {
 		}
 	}
 	
-	public static SensorColor getColor() {
+	public static SensorColor getLeftColor() {
 		return leftState;
 	}
-	
+
+	public static SensorColor getRightColor() {
+		return rightState;
+	}
+
 	private static int toInt(SensorColor c) {
 		if ( c == SensorColor.WHITE ) return 0;
 		if ( c == SensorColor.BLACK ) return 1;
@@ -133,24 +158,48 @@ public class SensorThread implements Runnable {
 		if ( c == SensorColor.BLUE ) return 6;
 		return 7;
 	}
-	private static SensorColor colorDecision(float[] value, float[][] data) {
-		if ( compereValue(value, data[BLACK], blackWidth, V) ) return SensorColor.BLACK;
+/*	private static SensorColor colorDecision(float[] value, float[][] data) {
 		if ( compereValue(value, data[BLUE], blueWidth, H) ) return SensorColor.BLUE;
+		if ( compereVValue(value[V], Float.MIN_VALUE, data[BLACK][V]) ) return SensorColor.BLACK;
+		if ( compereVValue(value[V], data[BLACK][V], data[GRAY1][V]) ) return SensorColor.GRAY1;
+		if ( compereVValue(value[V], data[GRAY1][V], data[GRAY2][V]) ) return SensorColor.GRAY2;
+		if ( compereVValue(value[V], data[GRAY2][V], data[GRAY3][V]) ) return SensorColor.GRAY3;
+		if ( compereVValue(value[V], data[GRAY3][V], data[GRAY4][V]) ) return SensorColor.GRAY4;
+		if ( compereVValue(value[V], data[GRAY4][V], Float.MAX_VALUE) ) return SensorColor.WHITE;
+		return SensorColor.ELSE;
+	}
+*/	
+	private static SensorColor colorDecision(float[] value, float[][] data) {
+		if ( compereValue(value, data[BLUE], blueWidth, H) ) return SensorColor.BLUE;
+		if ( compereValue(value, data[BLACK], blackWidth, V) ) return SensorColor.BLACK;
 		if ( compereValue(value, data[GRAY1], gray1Width, V) ) return SensorColor.GRAY1;
 		if ( compereValue(value, data[GRAY2], gray2Width, V) ) return SensorColor.GRAY2;
-		if ( compereValue(value, data[WHITE], whiteWidth, V) ) return SensorColor.WHITE;
 		if ( compereValue(value, data[GRAY3], gray3Width, V) ) return SensorColor.GRAY3;
 		if ( compereValue(value, data[GRAY4], gray4Width, V) ) return SensorColor.GRAY4;
+		if ( compereValue(value, data[WHITE], whiteWidth, V) ) return SensorColor.WHITE;
 		return SensorColor.ELSE;
 	}
 	
 	private static boolean compereValue(float value[], float data[], float width, int i) {
 		return Math.abs(value[i]-data[i]) <= width;
 	}
+	
+	private static boolean compereVValue(float value, float min, float max) {
+		return value <= max && value > min;
+	}
 
 	private static float[] getSensorValue(ColorSensor s) {
-		float f[];
-		f = s.getHSV();
+		float f[] = {0F, 0F, 0F};
+		float tmp[];
+		for ( int i = 0; i < COUNT; i++ ) {
+			tmp = s.getHSV();
+			for ( int j = 0; j < 3; j++ ) {
+				f[j] += tmp[j];
+			}
+		}
+		for ( int j = 0; j < 3; j++ ) {
+			f[j] /= COUNT;
+		}
 		f = cleanDecimal(f);
 		return f;
 	}
