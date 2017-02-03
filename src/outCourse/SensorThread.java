@@ -24,7 +24,16 @@ public class SensorThread implements Runnable {
 	private static float distance;
 	
 	// 色
-	private static String[] colorName = {"white", "black", "gray1", "gray2", "gray3", "gray4", "blue", "else"};
+	private static String[] colorName = {
+			"white",
+			"black",
+			"gray1",
+			"gray2",
+			"gray3",
+			"gray4",
+			"blue",
+			"else"
+			};
 	private static final int COLORS = 7;
 	private static final int WHITE = 0;
 	private static final int BLACK = 1;
@@ -66,6 +75,18 @@ public class SensorThread implements Runnable {
 	// 計測回数
 	static final int COUNT = 5;
 	
+	// 走行状態
+	private static final String[] STATE_NAME = {
+			"PRESS ENTER",
+			"STOP", 
+			"LINE TRACE", 
+			"TARGET SURROUND", 
+			"SHORT CIRCUIT", 
+			"GARAGE IN",
+			"GARAGE OUT",
+			"RECOVERY TRACE"
+			};
+
 	public SensorThread(ColorSensor left, ColorSensor right) {
 		int i;
 		leftColor = left;
@@ -82,17 +103,6 @@ public class SensorThread implements Runnable {
 		rightCalibData[i] = DualCalibration.getRightCalibDataAve(i);
 	}
 	
-	// 走行状態
-	private static final String[] STATE_NAME = {
-			"PRESS ENTER",
-			"STOP", 
-			"LINE TRACE", 
-			"TARGET SURROUND", 
-			"SHORT CIRCUIT", 
-			"GARAGE IN",
-			"GARAGE OUT",
-			"RECOVERY TRACE"
-			};
 	
 	@Override
 	public void run() {		
@@ -114,10 +124,20 @@ public class SensorThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * 目標を検知したか判定
+	 * @param min 判定距離の最小値
+	 * @param max 判定距離の最大値
+	 * @return boolean 発見しているかどうか
+	 */
 	public static boolean isFind(float min, float max) {
 		return distance <= max && distance >= min;
 	}
 	
+	/**
+	 * 黒線追跡の進行方向を判定
+	 * @return Direction 進行方向
+	 */
 	public static Direction dirDecision() {
 		if ( leftState == SensorColor.BLACK ) {
 			if ( rightState == SensorColor.BLACK ) return Direction.BOTH;
@@ -129,6 +149,11 @@ public class SensorThread implements Runnable {
 		
 	}
 	
+	/**
+	 * 諧調シートのどの位置にいるか判定し、進行の向きを判定
+	 * @param parkFinished
+	 * @return Direction 進行方向
+	 */
 	public static Direction posDicision(boolean parkFinished) {
 		if ( rightColorNum == leftColorNum ) return Direction.FRONT;
 		if ( parkFinished ) {
@@ -140,14 +165,27 @@ public class SensorThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * 左の色彩センサが現在検知している色を返却
+	 * @return SensorColor
+	 */
 	public static SensorColor getLeftColor() {
 		return leftState;
 	}
 
+	/**
+	 * 右の色彩センサが現在検知している色を返却
+	 * @return SensorColor
+	 */
 	public static SensorColor getRightColor() {
 		return rightState;
 	}
 
+	/**
+	 * 色を番号に変換
+	 * @param c 検知した色
+	 * @return 色に応じた整数
+	 */
 	private static int toInt(SensorColor c) {
 		if ( c == SensorColor.WHITE ) return 0;
 		if ( c == SensorColor.BLACK ) return 1;
@@ -158,6 +196,13 @@ public class SensorThread implements Runnable {
 		if ( c == SensorColor.BLUE ) return 6;
 		return 7;
 	}
+
+	/**
+	 * 検知している色を判定
+	 * @param value 計測したHSV値
+	 * @param data キャリブレーション用基準HSV値
+	 * @return SensorColor 検知している色
+	 */
 /*	private static SensorColor colorDecision(float[] value, float[][] data) {
 		if ( compereValue(value, data[BLUE], blueWidth, H) ) return SensorColor.BLUE;
 		if ( compereVValue(value[V], Float.MIN_VALUE, data[BLACK][V]) ) return SensorColor.BLACK;
@@ -168,7 +213,13 @@ public class SensorThread implements Runnable {
 		if ( compereVValue(value[V], data[GRAY4][V], Float.MAX_VALUE) ) return SensorColor.WHITE;
 		return SensorColor.ELSE;
 	}
-*/	
+*/
+	/**
+	 * 検知している色を判定
+	 * @param value 計測したHSV値
+	 * @param data キャリブレーション用基準HSV値
+	 * @return SensorColor 検知している色
+	 */
 	private static SensorColor colorDecision(float[] value, float[][] data) {
 		if ( compereValue(value, data[BLUE], blueWidth, H) ) return SensorColor.BLUE;
 		if ( compereValue(value, data[BLACK], blackWidth, V) ) return SensorColor.BLACK;
@@ -180,14 +231,27 @@ public class SensorThread implements Runnable {
 		return SensorColor.ELSE;
 	}
 	
+	/**
+	 * 値が指定範囲内か判定
+	 * @param value 判定する値
+	 * @param data 基準とする値
+	 * @param width 許容する誤差
+	 * @param i HSV番号
+	 * @return boolean
+	 */
 	private static boolean compereValue(float value[], float data[], float width, int i) {
 		return Math.abs(value[i]-data[i]) <= width;
 	}
-	
+/*
 	private static boolean compereVValue(float value, float min, float max) {
 		return value <= max && value > min;
 	}
-
+*/
+	/**
+	 * センサの値を取得し、平均値を返却
+	 * @param s 値を取得する色彩センサ
+	 * @return float[]
+	 */
 	private static float[] getSensorValue(ColorSensor s) {
 		float f[] = {0F, 0F, 0F};
 		float tmp[];
@@ -204,6 +268,11 @@ public class SensorThread implements Runnable {
 		return f;
 	}
 
+	/**
+	 * float型の小数第4位以下を除去
+	 * @param float[] float型の配列
+	 * @return float[] float型の配列
+	 **/
 	private static float[] cleanDecimal(float f[]){
 		for(int i = 0; i < f.length; i++) {
 			f[i] = (float)Math.floor((double)f[i] * 1000) / 1000;

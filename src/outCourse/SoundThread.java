@@ -36,10 +36,16 @@ public class SoundThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * 諧調発音モードに移行
+	 */
 	public static void setHarmonyModeON() {
 		isHarmony = true;
 	}
 
+	/**
+	 * 諧調発音モードから脱出
+	 */
 	public static void setHarmonyModeOFF() {
 		isHarmony = false;
 		beepedA = false;
@@ -48,10 +54,16 @@ public class SoundThread implements Runnable {
 		beepedD = false;
 	}
 	
+	/**
+	 * 目標検知モードに移行
+	 */
 	public static void setSearchModeON() {
 		isSearch = true;
 	}
 	
+	/**
+	 * 目標検知モードから脱出
+	 */
 	public static void setSearchModeOFF() {
 		isSearch = false;
 	}
