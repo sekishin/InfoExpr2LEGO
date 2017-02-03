@@ -11,6 +11,7 @@ public class SoundThread implements Runnable {
 	private static boolean beepedB = false;
 	private static boolean beepedC = false;
 	private static boolean beepedD = false;
+	private static boolean isSearch = false;
 	
 	@Override
 	public void run() {
@@ -25,9 +26,10 @@ public class SoundThread implements Runnable {
 				} else if ( SensorThread.getLeftColor() == SensorColor.GRAY4 ) {
 					beepD();
 				}
-			} else if (SensorThread.isFind(0.1F, 0.4F) ) {
+			} else if (SensorThread.isFind(0.1F, 0.4F) && isSearch ) {
 				Button.LEDPattern(1);
-				//Sound.beep();
+				Sound.beep();
+				setSearchModeOFF();
 			}
 			Delay.msDelay(50);
 			Button.LEDPattern(0);
@@ -45,27 +47,39 @@ public class SoundThread implements Runnable {
 		beepedC = false;
 		beepedD = false;
 	}
+	
+	public static void setSearchModeON() {
+		isSearch = true;
+	}
+	
+	public static void setSearchModeOFF() {
+		isSearch = false;
+	}
 
 	private void beepA() {
 		if ( beepedA ) return;
+		Button.LEDPattern(1);
 		Sound.playTone(440, 200);
 		beepedA = true;
 		
 	}
 	private void beepB() {
 		if ( beepedB ) return;
+		Button.LEDPattern(2);
 		Sound.playTone(880, 200);
 		beepedB = true;
 	}
 
 	private void beepC() {
 		if ( beepedC ) return;
+		Button.LEDPattern(3);
 		Sound.playTone(1760, 200);
 		beepedC = true;
 	}
 	
 	private void beepD() {
 		if ( beepedD ) return;
+		Button.LEDPattern(4);
 		Sound.playTone(3520, 200);
 		beepedD = true;
 	}

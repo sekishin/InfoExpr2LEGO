@@ -29,8 +29,9 @@ public class RunThread implements Runnable {
 	@Override
 	public void run() {
 		enterPressWait();
-		//areaA();
-		//areaB();
+		//surrounding();
+		areaA();
+		areaB();
 		areaC();
 		//test();
 		motorStop();
@@ -46,30 +47,44 @@ public class RunThread implements Runnable {
 	//	エリア分け
 	//===============================================
 	private void areaA() {
-		while ( Button.ESCAPE.isUp() ) {
+		int lineTraceTacoCount = 2900;
+		int searchTachoCount = 600;
+		leftMotor.resetTachoCount();
+		while ( Button.ESCAPE.isUp() && leftMotor.getTachoCount() <= lineTraceTacoCount ) {
 			quickLineTrace();
+		}
+		SoundThread.setSearchModeON();
+		leftMotor.resetTachoCount();
+		while ( Button.ESCAPE.isUp() && leftMotor.getTachoCount() <= searchTachoCount ) {
+			slowLineTrace();
 			if ( SensorThread.isFind(0.05F, 0.4F) ) {
 				targetSurrounding();
 				break;
 			}
 		}
+		SoundThread.setSearchModeOFF();
 	}
 	
 	private void areaB() {
-		int quickTachoCount = 4300;
-		//int quickTachoCount = 0;
+		int quickTachoCount = 5000;
+		int searchTachoCount = 500;
+		//int quickTachoCount = 0;		
+		int slowTachoCount = 300;
 
 		leftMotor.resetTachoCount();
-		while ( Button.ESCAPE.isUp() ) {
-			if ( leftMotor.getTachoCount() <= quickTachoCount) quickLineTrace();
-			else  {
-				slowLineTrace();
-				if ( SensorThread.isFind(0.1F, 0.4F) ) {
-					shortCircuit();
-					break;
-				}
-			}
+		while ( Button.ESCAPE.isUp() && leftMotor.getTachoCount() <= slowTachoCount) slowLineTrace();
+
+		leftMotor.resetTachoCount();
+		while ( Button.ESCAPE.isUp() && leftMotor.getTachoCount() <= quickTachoCount ) {
+			quickLineTrace();
 		}
+		
+		SoundThread.setSearchModeON();
+		leftMotor.resetTachoCount();
+		while ( Button.ESCAPE.isUp() && leftMotor.getTachoCount() <= searchTachoCount && ! SensorThread.isFind(0.05F, 0.4F) ) {
+			slowLineTrace();
+		}
+		shortCircuit();
 	}
 	
 	private void areaC() {
@@ -96,15 +111,15 @@ public class RunThread implements Runnable {
 	//	黒線追跡
 	//===============================================
 	private static void quickLineTrace() {
-		final int highSpeed = 600;
-		final int lowSpeed = 400;
+		final int highSpeed = 700;
+		final int lowSpeed = 450;
 		
 		lineTrace(highSpeed, lowSpeed);
 	}
 	
 	private static final void slowLineTrace() {
-		final int highSpeed = 300;
-		final int lowSpeed = 100;
+		final int highSpeed = 400;
+		final int lowSpeed = 150;
 		
 		lineTrace(highSpeed, lowSpeed);
 	}
@@ -140,8 +155,8 @@ public class RunThread implements Runnable {
 	
 	private void surrounding() {
 		runState = SURROUND;
-		int leftSpeed = 430;
-		int rightSpeed = 600;
+		int leftSpeed = 540;
+		int rightSpeed = 750;
 		int runTachoCount = 3200;
 		
 		motorSetSpeed(leftSpeed, rightSpeed);
@@ -149,8 +164,6 @@ public class RunThread implements Runnable {
 		while (leftMotor.getTachoCount() <= runTachoCount && Button.ESCAPE.isUp()) {
 			motorForward();
 		}
-		motorStop();
-
 	}
 	
 	private void recoveryLineTrace() {
@@ -179,7 +192,6 @@ public class RunThread implements Runnable {
 		while (leftMotor.getTachoCount() <= runTachoCount && Button.ESCAPE.isUp()) {
 			motorForward();
 		}
-		motorStop();
 		
 		recoveryLineTrace();
 	}
@@ -191,19 +203,24 @@ public class RunThread implements Runnable {
 		runState = GARAGE_IN;
 		int reverseTachoCount = 200;
 		int turnTachoCount = 170;
+		int tachoCount = 150;
 		int backTachoCount;
 		boolean outLeft = false;
 		boolean outRight = false;
 		SoundThread.setHarmonyModeON();
-		while ( Button.ESCAPE.isUp() && SensorThread.getLeftColor() != SensorColor.GRAY4 && SensorThread.getRightColor() != SensorColor.GRAY4 ) {
+		while ( Button.ESCAPE.isUp() && SensorThread.getLeftColor() != SensorColor.GRAY4 
+				&& SensorThread.getRightColor() != SensorColor.GRAY4 ) {
 			adjustmentRun(false);
 		}
-		motorStop();
+
 		SoundThread.setHarmonyModeOFF();
-		while ( Button.ESCAPE.isUp() && SensorThread.getLeftColor() != SensorColor.GRAY3 && SensorThread.getRightColor() != SensorColor.GRAY3 ) {
+		leftMotor.resetTachoCount();
+		while ( Button.ESCAPE.isUp() && SensorThread.getLeftColor() != SensorColor.GRAY3 
+				&& SensorThread.getRightColor() != SensorColor.GRAY3 
+				|| leftMotor.getTachoCount() <= tachoCount) {
 			adjustmentRun(false);
 		}
-		motorStop();
+		
 		// 左回転
 		motorSetSpeed(200, 200);
 		rightMotor.resetTachoCount();

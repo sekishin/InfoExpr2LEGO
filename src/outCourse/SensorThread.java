@@ -110,7 +110,7 @@ public class SensorThread implements Runnable {
 			LCD.drawString("R : " + colorName[rightColorNum], 0, 2);
 			LCD.drawString("D : " + distance, 0, 3);
 			LCD.refresh();
-			Delay.msDelay(50);
+			Delay.msDelay(20);
 		}
 	}
 	
