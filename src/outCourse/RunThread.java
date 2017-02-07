@@ -30,7 +30,8 @@ public class RunThread implements Runnable {
 	
 	@Override
 	public void run() {
-		enterPressWait();
+		//enterPressWait();
+		touchPressWait();
 		areaA();
 		areaB();
 		areaC();
@@ -104,6 +105,7 @@ public class RunThread implements Runnable {
 			slowLineTrace();
 		}
 		shortCircuit();
+		SoundThread.setSearchModeOFF();
 	}
 	
 	/**
@@ -119,7 +121,7 @@ public class RunThread implements Runnable {
 			slowLineTrace();
 
 		//-- 車庫近くまで高速走行
-		int quickTachoCount = 3000;
+		int quickTachoCount = 3500;
 		leftMotor.resetTachoCount();
 		while ( Button.ESCAPE.isUp() 
 				&& leftMotor.getTachoCount() <= quickTachoCount) 
@@ -226,7 +228,7 @@ public class RunThread implements Runnable {
 	private void recoveryLineTrace() {
 		runState = RECOVERY;
 		final int speed = 500;
-		int recoveryTachoCount = 500;
+		int recoveryTachoCount = 300;
 		
 		//-- 左の色彩センサが黒を検知するか、一定距離進むまで直進
 		motorSetSpeed(speed, speed);
@@ -290,7 +292,7 @@ public class RunThread implements Runnable {
 		}
 
 		//-- 一定距離以上進み、灰3を検知するまで向き調整しながら前進
-		int tachoCount = 150;
+		int tachoCount = 160;
 		SoundThread.setHarmonyModeOFF();
 		leftMotor.resetTachoCount();
 		while ( Button.ESCAPE.isUp() 
@@ -301,14 +303,15 @@ public class RunThread implements Runnable {
 		}
 		
 		//-- 左に一定距離回転(⇒一定距離+左が灰3を検知するまでに変更?)
-		int garageSpeed = 200;
-		int turnTachoCount = 170;
+		int garageSpeed = 400;
+		int turnTachoCount = 150;
 		motorSetSpeed(garageSpeed, garageSpeed);
 		rightMotor.resetTachoCount();
 		while ( Button.ESCAPE.isUp() 
 				&& rightMotor.getTachoCount() <= turnTachoCount ) {
 			turnLeft();
 		}
+		motorBackward();
 		
 		//-- 青をどちらかの色彩センサが検知するまで直進(⇒灰4の範囲で進むように変更?)
 		leftMotor.resetTachoCount();
@@ -328,7 +331,7 @@ public class RunThread implements Runnable {
 		runState = GARAGE_OUT;
 
 		//-- 進んだ距離だけ更新
-		int garageSpeed = 200;
+		int garageSpeed = 400;
 		rightMotor.resetTachoCount();
 		motorSetSpeed(garageSpeed, garageSpeed);
 		while ( Button.ESCAPE.isUp() 
@@ -337,12 +340,13 @@ public class RunThread implements Runnable {
 		}
 		
 		//-- 右に一定距離だけ回転(⇒一定距離+左が灰3を検知するまでに変更?)
-		int turnTachoCount = 170;
+		int turnTachoCount = 160;
 		leftMotor.resetTachoCount();
 		while ( Button.ESCAPE.isUp() 
 				&& leftMotor.getTachoCount() <= turnTachoCount ) {
 			turnRight();
 		}
+		motorBackward();
 		
 		//-- 左右の色彩センサの少なくとも一方が城を検知するまで向き調整しながら前進
 		boolean outLeft = false;
