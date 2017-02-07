@@ -149,8 +149,8 @@ public class RunThread implements Runnable {
 	 * 高速黒線追跡
 	 */
 	private static void quickLineTrace() {
-		final int highSpeed = 700;
-		final int lowSpeed = 450;
+		final int highSpeed = 740;
+		final int lowSpeed = 500;
 		
 		lineTrace(highSpeed, lowSpeed);
 	}
